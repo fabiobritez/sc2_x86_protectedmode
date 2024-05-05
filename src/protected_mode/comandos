@@ -1,0 +1,4 @@
+as -g -o activate_protected_mode.o activate_protected_mode.S
+ld --oformat binary -o protected_mode.img -T link.ld activate_protected_mode.o
+unset GTK_PATH 
+qemu-system-x86_64 --drive file=protected_mode.img,format=raw,index=0,media=disk
