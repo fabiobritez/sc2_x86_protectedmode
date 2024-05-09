@@ -57,6 +57,7 @@ gdt_descriptor:
     .long gdt_start
 vga_current_line:
     .long 0
+    
 .code32
 protected_mode:
     /* Setup the other segments.
@@ -73,15 +74,12 @@ protected_mode:
      * It depends on how much RAM we have.
      */
 
-
-
-
-
     mov $0X7000, %ebp /* Esto para que no se pise el stack */
 
     mov %ebp, %esp 
 
-/* Finaliza la inicializacion del modo protegido */
+
+        /* Finaliza la inicializacion del modo protegido */
   
    /*VGA_PRINT_STRING, sacado de la macro*/ 
     
@@ -89,7 +87,6 @@ protected_mode:
     push %ebx
     push %ecx
     push %edx
-
 
 
     mov $message, %ecx
@@ -117,7 +114,6 @@ loop:
     jmp loop
 end:
     incl vga_current_line
-    
 
     pop %edx
     pop %ecx
