@@ -15,6 +15,7 @@
    - Cabrera, Augusto Gabriel 
    - Moroz, Esteban Mauricio 
    - Britez, Fabio
+   - Gonzalez, Bruno
 
 **Fecha:** 1/5/2024
    
