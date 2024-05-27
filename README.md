@@ -314,3 +314,107 @@ En modo protegido, la carga de registros de segmento con selectores de segmento 
   - El esquema de selectores de segmento permite la compatibilidad con el modo real, ya que los selectores de segmento pueden verse como direcciones físicas en modo real.
   - Esto facilita la transición entre los modos de operación y la ejecución de programas heredados.
 
+
+
+
+### Depuración de 'Fallo de Escritura' en Área de Lectura
+
+A continuación, se presenta la ejecución del programa solicitado en el desafío número 3 utilizando 
+`GDB`. En este desafío, se debe intentar escribir en una zona de solo lectura. Se observa un fallo de segmentación provocado por el intento de escritura en la mencionada zona de solo lectura.
+
+Además, se proporciona un listado de los registros y la ubicación exacta donde ocurre el fallo.
+
+
+```bash
+
+(base) esteban@esteban-VirtualBox:~/Desktop/SISTEMAS DE COMPUTACION/pruebatp3$ gdb programa
+GNU gdb (Ubuntu 12.1-0ubuntu1~22.04) 12.1
+Copyright (C) 2022 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+--Type <RET> for more, q to quit, c to continue without paging--
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from programa...
+(gdb) 
+(gdb) 
+(gdb) b _start
+Breakpoint 1 at 0x8049000: file programa.asm, line 7.
+(gdb) next
+The program is not being run.
+(gdb) r
+Starting program: /home/esteban/Desktop/SISTEMAS DE COMPUTACION/pruebatp3/programa 
+
+Breakpoint 1, data_segment () at programa.asm:7
+7           db "This is some data"
+(gdb) n
+
+Program received signal SIGSEGV, Segmentation fault.
+0x08049028 in ?? () at programa.asm:17
+17      mov ebx, data_segment    ; Set EBX to the address of the data segment
+(gdb) n
+
+Program terminated with signal SIGSEGV, Segmentation fault.
+The program no longer exists.
+(gdb) n
+The program is not being run.
+(gdb) x/10x data_segment
+0x8049000 <data_segment>:       0x73696854   0x20736920       0x656d6f73      0x74616420
+0x8049010:      0x000fb861      0x00b90000   0xbb080490       0x00000002
+0x8049020:      0x61b81989      0xbb000000
+(gdb) p data_segment
+$1 = {<text variable, no debug info>} 0x8049000 <data_segment>
+(gdb) x/10x data_segment
+0x8049000 <data_segment>:       0x73696854      0x20736920      0x656d6f73      0x74616420
+0x8049010:      0x000fb861      0x00b90000      0xbb080490      0x00000002
+0x8049020:      0x61b81989      0xbb000000
+(gdb) info registers 
+The program has no registers now.
+(gdb) run
+Starting program: /home/esteban/Desktop/SISTEMAS DE COMPUTACION/pruebatp3/programa 
+
+Breakpoint 1, data_segment () at programa.asm:7
+7           db "This is some data"
+(gdb) c
+Continuing.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x08049028 in ?? () at programa.asm:17
+17      mov ebx, data_segment    ; Set EBX to the address of the data segment
+(gdb) info registers 
+eax            0x0                 0
+ecx            0x0                 0
+edx            0x0                 0
+ebx            0x0                 0
+esp            0xffffc9b8          0xffffc9b8
+ebp            0x0                 0x0
+esi            0x0                 0
+edi            0x0                 0
+eip            0x8049028           0x8049028
+eflags         0x10202             [ IF RF ]
+cs             0x23                35
+ss             0x2b                43
+ds             0x2b                43
+es             0x2b                43
+--Type <RET> for more, q to quit, c to continue without paging--
+fs             0x0                 0
+gs             0x0                 0
+(gdb) Quit
+(gdb) x/i $pc
+=> 0x8049028:   add    %dl,0x3890804(%eax) (VER NOTA)
+```
+
+NOTA: La última línea indica que el error ocurre al intentar escribir en el registro que simula el segmento de datos.
+
+
+
+
